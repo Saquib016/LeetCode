@@ -6,7 +6,7 @@ public:
         int ans = 0;
 
         while(left < right)
-        {
+        {   //use 2 pointer
             int area = min(height[left], height[right]) * (right - left);
             ans = max(ans, area);
 
