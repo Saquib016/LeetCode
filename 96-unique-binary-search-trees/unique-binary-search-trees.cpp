@@ -7,8 +7,8 @@ public:
             int ans = 0;
             for(int j= 0;j<=i-1;j++){
                 ans+=dp[j]*dp[i-j-1];
-                dp[i] = ans;
             }
+                dp[i] = ans;
         }
         return dp[n];
     }
