@@ -6,11 +6,12 @@ public:
         for (char c : s)
             cnt[c - 'a']++;
 
-        string left = "";
-        char mid = '\0';
+        string left;
+        char mid = 0;
 
         for (int i = 0; i < 26; i++) {
             left.append(cnt[i] / 2, char('a' + i));
+
             if (cnt[i] % 2)
                 mid = char('a' + i);
         }
