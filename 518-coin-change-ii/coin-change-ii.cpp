@@ -2,7 +2,7 @@ class Solution {
 public:
     int change_help(int n,int W,vector<int> coins,vector<vector<int>>& dp){
         if(W==0) return 1;
-        if(n==0 && W>0) return 0;
+        if(n==0 && W) return 0;
         if(dp[n][W]!=-1) return dp[n][W];
         else{
             if(W>=coins[n-1]){
