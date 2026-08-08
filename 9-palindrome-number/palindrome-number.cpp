@@ -1,20 +1,20 @@
 class Solution {
 public:
     bool isPalindrome(int x) {
-        int rev = 0;
-        int y = x;
-        int digit;
+        vector<int> arr;
         if(x<0) return false;
-        while (x!=0){
-            if(x!=0){
-                digit = x%10;
-                x=x/10;
-            }
-            if(rev>INT_MAX/10 || (rev == INT_MAX/10 && digit >7)) return 0;
-            if(rev<INT_MIN/10 || (rev == INT_MIN/10 && digit<-8)) return 0;
-            rev = rev*10+digit;
+        while(x!=0){
+            int temp = x%10;
+            arr.push_back(temp);
+            x=x/10;
         }
-        if(y==rev) return true;
-        else return false;
+        int i = 0;
+        int j = arr.size()-1;
+        while(i<=j){
+            if(arr[i]!=arr[j]) return false;
+            i++;j--;
+        }
+        return true;
+        
     }
 };
