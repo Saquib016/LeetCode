@@ -1,3 +1,4 @@
+// Here We use Frequency Array so that its easy to count nums.
 class Solution {
 public:
     vector<int> findErrorNums(vector<int>& nums) {
