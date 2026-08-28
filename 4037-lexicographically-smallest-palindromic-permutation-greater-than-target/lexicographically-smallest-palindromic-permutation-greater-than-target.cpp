@@ -1,94 +1,96 @@
 class Solution {
-public:
-    string isPossible(int n, vector<int> freq, string cur, char &mid, string& target){
-        // this gives the max palindrome achievable with the current prefix 
-        //(descending order)
-        for(int i=25; i>=0; i--){
-            while(freq[i]){
-                cur += (char)('a'+i);
-                freq[i]--;
+   public:
+    static auto lexPalindromicPermutation(std::string source,
+                                          std::string target) -> std::string {
+        const int length = static_cast<int>(source.size());
+
+        std::vector<int> counts(ALPHABET_SIZE, 0);
+        for (const char letter : source) {
+            counts[static_cast<std::size_t>(letter - 'a')]++;
+        }
+
+        int odd_letter = -1;
+        for (int idx = 0; idx < ALPHABET_SIZE; ++idx) {
+            if (counts[static_cast<std::size_t>(idx)] % 2 == 1) {
+                if (odd_letter >= 0) {
+                    return "";
+                }
+                odd_letter = idx;
             }
+            counts[static_cast<std::size_t>(idx)] /= 2;
         }
-        if(mid!='#'){
-            // odd-length palindrome: left half + mid + reverse(left half)
-            string temp = cur;
-            cur += mid;
-            reverse(temp.begin(), temp.end());
-            cur.append(temp.begin(), temp.end());
+
+        const int half_len = length / 2;
+        std::string result(static_cast<std::size_t>(length), 'a');
+        if (odd_letter >= 0) {
+            result[static_cast<std::size_t>(half_len)] =
+                static_cast<char>('a' + odd_letter);
         }
-        else {
-            // even-length palindrome: left half + reverse(left half)
-            string temp = cur;
-            reverse(temp.begin(), temp.end());
-            cur.append(temp.begin(), temp.end());
+
+        if (dfs(0, half_len, length, target, counts, result, false, false)) {
+            return result;
         }
-        // feasibility check: only valid if this (largest possible) candidate beats target
-        return cur>target? cur : "";
+        return "";
     }
 
-    string lexPalindromicPermutation(string s, string target) {
-        int n = s.size();
-        vector<int> freq(26, 0);
-        if(n==1){
-            // if size is 1 then direct compare
-            if(s>target) return s;
-            else return "";
-        }
-        for(char c : s) freq[c-'a']++; // freq Track
+   private:
+    static constexpr int ALPHABET_SIZE = 26;
 
-        char mid = '#';
-        int oddCount = 0;
-
-        for(int i=0; i<26; i++){
-            if(freq[i]%2){
-                // odd count -> this becomes the middle character
-                mid = (char)('a'+i);
-                freq[i]--;
-                oddCount++;
-            }
-
-            freq[i] /= 2; // each char used freq[i]/2 times in the left half
-
-            if(oddCount>=2) return ""; // more than one odd-frequency char -> can't form a palindrome
-        }
-
-        n /= 2; // we only need to construct the left half now
-        string res = "", prefix = "";
-
-        // greedily build the left half, position by position
-        for(int i=0; i<n; i++){
-
-            string cur = prefix;
-            bool isThereAny = false;
-
-            // try smallest character first ('a' -> 'z')
-            for(int j=0; j<26; j++){
-                if(freq[j]){
-                    freq[j]--;
-                    cur += (char)('a'+j);
-
-                    // check if this prefix can still lead to a palindrome > target
-                    string isPos = isPossible(n, freq, cur, mid, target);
-
-                    if(isPos!=""){
-                        prefix = cur;      // keep this character, lock in the prefix
-                        isThereAny = true;
-
-                        if(res=="") res = isPos;
-                        else res = min(res, isPos); // track smallest valid candidate seen
-                        break;
-                    }
-
-                    // this character doesn't work, undo and try the next one
-                    freq[j]++;
-                    cur.pop_back();
+    static auto dfs(int pos, int half_len, int length,
+                    const std::string& target, std::vector<int>& counts,
+                    std::string& result, bool greater_left, bool greater_right)
+        -> bool {
+        if (pos == half_len) {
+            if (length % 2 == 1) {
+                const char mid_char =
+                    result[static_cast<std::size_t>(half_len)];
+                const char target_mid =
+                    target[static_cast<std::size_t>(half_len)];
+                bool final_right = greater_right;
+                if (mid_char > target_mid) {
+                    final_right = true;
+                } else if (mid_char < target_mid) {
+                    final_right = false;
                 }
+                return greater_left || final_right;
             }
-
-            if(!isThereAny)
-                return ""; // no character works at this position -> impossible
+            return greater_left || greater_right;
         }
 
-        return res; 
+        const int mirror = length - 1 - pos;
+        const int start =
+            greater_left ? 0 : (target[static_cast<std::size_t>(pos)] - 'a');
+
+        for (int letter = start; letter < ALPHABET_SIZE; ++letter) {
+            if (counts[static_cast<std::size_t>(letter)] <= 0) {
+                continue;
+            }
+            counts[static_cast<std::size_t>(letter)]--;
+
+            const char placed = static_cast<char>('a' + letter);
+            result[static_cast<std::size_t>(pos)] = placed;
+            result[static_cast<std::size_t>(mirror)] = placed;
+
+            const bool new_greater_left =
+                greater_left ||
+                (placed > target[static_cast<std::size_t>(pos)]);
+
+            bool new_greater_right = greater_right;
+            const char target_mirror = target[static_cast<std::size_t>(mirror)];
+            if (placed > target_mirror) {
+                new_greater_right = true;
+            } else if (placed < target_mirror) {
+                new_greater_right = false;
+            }
+
+            if (dfs(pos + 1, half_len, length, target, counts, result,
+                    new_greater_left, new_greater_right)) {
+                return true;
+            }
+
+            counts[static_cast<std::size_t>(letter)]++;
+        }
+
+        return false;
     }
 };
