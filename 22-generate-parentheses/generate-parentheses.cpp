@@ -1,24 +1,32 @@
 class Solution {
 public:
+
+    void solve(int n, int open, int close, string current, vector<string>& ans) {
+
+        // agar n pairs complete ho gaye
+        if (open == n && close == n) {
+            ans.push_back(current);
+            return;
+        }
+
+        // opening bracket laga sakte hain
+        if (open < n) {
+            solve(n, open + 1, close, current + "(", ans);
+        }
+
+        // closing bracket tabhi laga sakte hain
+        // jab opening brackets zyada hain
+        if (close < open) {
+            solve(n, open, close + 1, current + ")", ans);
+        }
+    }
+
     vector<string> generateParenthesis(int n) {
-        if (n-- == 1) return {"()"};
 
-        vector<string> res;
-        auto dfs = [&](auto& self, int O, int C, string s) -> void {
-            if (O == 0 && C == 0) {
-                res.push_back(s + ")");
-                return;
-            }
+        vector<string> ans;
 
-            if (O > 0)
-                self(self, O - 1, C, s + "(");
+        solve(n, 0, 0, "", ans);
 
-            if (C >= O)
-                self(self, O, C - 1, s + ")");
-        };
-
-        dfs(dfs, n, n, "(");
-
-        return res;
+        return ans;
     }
 };
