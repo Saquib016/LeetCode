@@ -1,15 +1,29 @@
 class Solution {
 public:
-    const int M = 1e9+7;
-    long long pownum(long long a,long long b){
-        if(b==0) return 1;
-        long long power = pownum(a,b/2);
-        long long result = power* power%M;
-        if(b%2==1) result = (result*a)%M ;
-        return result%M;
+    long long mod = 1000000007;
+
+    long long power(long long base, long long exp) {
+        long long ans = 1;
+
+        while (exp > 0) {
+            if (exp % 2 == 1) {
+                ans = (ans * base) % mod;
+            }
+
+            base = (base * base) % mod;
+            exp /= 2;
+        }
+
+        return ans;
     }
+
     int countGoodNumbers(long long n) {
-        long long res = (pownum(5,(n+1)/2)*pownum(4,n/2));
-        return res % M;
+        long long even = (n + 1) / 2;
+        long long odd = n / 2;
+
+        long long a = power(5, even);
+        long long b = power(4, odd);
+
+        return (a * b) % mod;
     }
 };
