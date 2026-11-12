@@ -10,7 +10,7 @@ public:
             int k = nums.size()-1;
             while(j<k){
                 int sum = nums[i]+nums[j]+nums[k];
-                if(sum == 0){ ans.insert({nums[i],nums[j],nums[k]});j++;k--;}
+                if(sum == 0){ ans.insert({nums[i],nums[j],nums[k]});k--;}
                 else if(sum<0) j++;
                 else k--;
 
